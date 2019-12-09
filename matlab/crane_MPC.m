@@ -27,25 +27,30 @@ function u_out = crane_MPC(t_remain,u_num,q_f,q_0, parameters,u_max,theta_max)
         %disp(c)
         ceq = [];
     end
+
     function cost = cost_function(u)
-        
-        t_u = linspace(0,t_remain,u_num);
+
         simdata = crane_model(u,q_0, parameters, t_remain);
-        q = simdata.q;
         %disp(size(q));
         sol = simdata.sol;
         tu = linspace(0,t_remain,u_num);
         xu = deval(sol,tu);
-        gain = [1;1;0.75;0.1];
+        
         cost = 0;
 
         for i = 2:u_num
+            if i == u_num
+                gain = [1;1;1;1];
+            else
+                gain = [0.3;0.3;0.1;0.1];
+            end
         cost_i = ((xu(1,i)-q_f(1))*gain(1))^2 +...
                 ((xu(2,i)-q_f(2))*gain(2))^2 +...
                 ((xu(3,i)-q_f(3))*gain(3))^2 +...
                 ((xu(4,i)-q_f(4))*gain(4))^2 ;
             cost = cost+cost_i;
         end
-
     end
+
+
 end
